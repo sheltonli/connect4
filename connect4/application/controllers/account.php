@@ -6,6 +6,7 @@ class Account extends CI_Controller {
     		// Call the Controller constructor
 	    	parent::__construct();
 	    	session_start();
+	    	$this->load->library('securimage');
     }
         
     public function _remap($method, $params = array()) {
@@ -76,7 +77,7 @@ class Account extends CI_Controller {
 	    	$this->form_validation->set_rules('first', 'First', "required");
 	    	$this->form_validation->set_rules('last', 'last', "required");
 	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]");
-	    	
+	    	$this->form_validation->set_rules('captchacode', 'Enter Code', "required|callback_check_captcha");
 	    
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
@@ -193,6 +194,23 @@ class Account extends CI_Controller {
 	    			$this->load->view('account/recoverPasswordForm',$data);
 	    		}
 	    	}
-    }    
+    }
+
+    function create_captcha(){
+    	$img = new Securimage();
+    	return $img->show();
+    }
+
+    function check_captcha(){
+    	$img = new Securimage();
+    	$input = $this->input->post('captchacode');
+    	$result = $img->check($input); 
+
+    	if(!$result){
+    		$this->form_validation->set_message('check_captcha', 'Incorrect Code');
+        	return false;
+    	}
+        return true;
+    }
  }
 
