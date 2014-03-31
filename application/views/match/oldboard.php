@@ -3,7 +3,6 @@
 
 <html>
 	<head>
-        <link rel="stylesheet" type="text/css" href="<?= base_url() ?>css/template.css" media="all">
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
 	<script>
@@ -53,13 +52,9 @@
 	</script>
 	</head> 
 <body>  
-	<div id="board"></div>
-	<script type ="text/javascript" src="<?= base_url() ?>js/threejs/three.min.js"></script>
-	<script type ="text/javascript" src="<?= base_url() ?>js/threejs/OrbitControls.js"></script>
-	<script type="text/javascript" src="<?= base_url() ?>js/threejs/Detector.js"></script>
-	<script type ="text/javascript" src="<?= base_url() ?>js/board.js"></script>
+	<h1>Game Area</h1>
 
-	<div id="hello">
+	<div>
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  
 	</div>
 	
@@ -70,6 +65,8 @@
 		else
 			echo "Wating on " . $otherUser->login;
 	?>
+	</div>
+	
 <?php 
 	
 	echo form_textarea('conversation');
@@ -80,9 +77,6 @@
 	echo form_close();
 	
 ?>
-
-	</div>
-	
 	
 	
 	
