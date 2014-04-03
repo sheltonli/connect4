@@ -26,7 +26,10 @@ renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setClearColor(0x000000, 1);
 renderer.sortObjects = false;
-document.body.appendChild( renderer.domElement );
+//document.body.appendChild( renderer.domElement );
+var container = document.getElementById("board");
+document.body.appendChild(container);
+container.appendChild(renderer.domElement);
 
 pivot = new THREE.Object3D();
 board = addBoard();
@@ -90,7 +93,7 @@ for (i=0; i<42; i++) {
 projector = new THREE.Projector();
 document.addEventListener("mousedown", mouseDown, false);
 
-controls = new THREE.OrbitControls(camera);
+controls = new THREE.OrbitControls(camera, container);
 controls.noPan = true;
 controls.noRoll = true;
 controls.domElement = document.body;
@@ -99,7 +102,7 @@ window.addEventListener('resize', onWindowResize, false);
 }
 
 function mouseDown(event) {
-	event.preventDefault();
+	//event.preventDefault();
 
 	var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
 	projector.unprojectVector(vector, camera);
@@ -110,6 +113,10 @@ function mouseDown(event) {
 	if (intersects.length > 0) {
 		addChip(intersects[0].object.col);			
 	} 
+}
+
+function callMe() {
+	console.log("you rang?");
 }
 
 function gameOver(row, col, colour) {
