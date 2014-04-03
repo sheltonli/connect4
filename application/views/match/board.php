@@ -69,19 +69,20 @@
 		else
 			echo "Wating on " . $otherUser->login;
 	?>
-<?php 
-	
-	echo form_textarea('conversation');
-	
-	echo form_open();
-	echo form_input('msg');
-	echo form_submit('Send','Send');
-	echo form_close();
-	
-?>
+
 
 	</div>
-	
+
+	<?php 
+		
+		echo form_textarea('conversation');
+		
+		echo form_open();
+		echo form_input('msg');
+		echo form_submit('Send','Send');
+		echo form_close();
+		
+	?>
 	
 	
 	
