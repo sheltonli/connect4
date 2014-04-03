@@ -53,11 +53,10 @@
 	</script>
 	</head> 
 <body>  
-	<div id="board"></div>
-	<script type ="text/javascript" src="<?= base_url() ?>js/threejs/three.min.js"></script>
-	<script type ="text/javascript" src="<?= base_url() ?>js/threejs/OrbitControls.js"></script>
-	<script type="text/javascript" src="<?= base_url() ?>js/threejs/Detector.js"></script>
-	<script type ="text/javascript" src="<?= base_url() ?>js/board.js"></script>
+	<!-- had to use this iframe to avoid conflicting click detection between the chat and the 3d board-->
+	<div id="board">
+        	<iframe width ="630" height="630" scrolling="no" frameborder="no" src="<?= base_url() ?>js/board.html"></iframe>
+	</div>
 
 	<div id="hello">
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  
