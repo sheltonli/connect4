@@ -9,6 +9,7 @@ var ydeg = 0;
 var xdeg = 0;
 var winners = [];
 var win = false;
+var tiecount = 0;
 
 init();
 animate();
@@ -112,17 +113,18 @@ function mouseDown(event) {
 
 	if (intersects.length > 0) {
 		col = intersects[0].object.col;
-		var url = "placechip/" + col;
+		tiecount = tiecount + 1;
+		addChip(intersects[0].object.col);	
+		var url = "placeChip/" + col;
 		$.post(url, function (){
-			addChip(intersects[0].object.col);	
 			return;
 		});		
 	} 
 }
 
-function callMe() {
-	console.log("you rang?");
-}
+//function callMe() {
+//	console.log("you rang?");
+//}
 
 function gameOver(row, col, colour) {
 
@@ -240,6 +242,18 @@ function gameOver(row, col, colour) {
 			balls[winners[i][0]][winners[i][1]].material.color.setHex(0x0000FF);
 
 		}
+
+		var url = "youWin/";
+		$.post(url, function (){
+			return;
+		});
+	}
+
+	if (tiecount == 42) {
+		var url = "youTie/";
+		$.post(url, function (){
+			return;
+		});
 	}
 }
 

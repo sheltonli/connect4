@@ -11,6 +11,7 @@
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
 		var status = "<?= $status ?>";
+		var t = 1;
 		
 		$(function(){
 			$('body').everyTime(2000,function(){
@@ -36,9 +37,10 @@
 						}
 					});
 
-					$.getJSON("<?= base_url() ?>board/getChip", function (data,text,jqXHR){
+					$.getJSON("<?= base_url() ?>board/getChip/" + t, function (data,text,jqXHR){
 						if (data && data.status=='success') {
 							var col = data.col;
+							t = data.turn;
 							if (col != 'NULL')
 								addChip(col);
 						}
@@ -92,10 +94,6 @@
 		echo form_submit('Send','Send');
 		echo form_close();
 		
-	?>
-
-	<?php
-		echo "<script> callMe() </script>"
 	?>
 	
 </body>

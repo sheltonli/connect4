@@ -204,5 +204,65 @@ class Board extends CI_Controller {
 			echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
 
+	function youWin() {
+		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+
+ 		$user = $_SESSION['user'];
+ 			 
+ 		$user = $this->user_model->getExclusive($user->login);
+
+ 		if ($user->user_status_id != User::PLAYING) {	
+			$errormsg="Not in PLAYING state";
+ 			goto error;
+ 		}
+
+ 		$match = $this->match_model->get($user->match_id);			
+
+		if ($match->user1_id == $user->id) {
+ 			$this->match_model->updateStatus($match->id, 2);
+			echo $user->login . "won!!";
+			
+
+ 		}
+ 		else {
+ 			$this->match_model->updateStatus($match->id, 3);
+			echo $user->login . "won!!";
+ 		}
+ 			
+ 		echo json_encode(array('status'=>'success'));
+ 			 
+ 		return;
+ 		
+		error:
+			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
+	function youTie() {
+		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+
+ 		$user = $_SESSION['user'];
+
+		$user = $this->user_model->getExclusive($user->login);
+
+ 		if ($user->user_status_id != User::PLAYING) {	
+			$errormsg="Not in PLAYING state";
+ 			goto error;
+ 		}
+
+ 		$match = $this->match_model->get($user->match_id);			
+
+ 		$this->match_model->updateStatus($match->id, 4);
+ 			
+ 		echo json_encode(array('status'=>'success'));
+ 			 
+ 		return;
+ 		
+		error:
+			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
+
  }
 
