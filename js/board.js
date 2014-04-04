@@ -111,7 +111,12 @@ function mouseDown(event) {
 	var intersects = raycaster.intersectObjects(objects);
 
 	if (intersects.length > 0) {
-		addChip(intersects[0].object.col);			
+		col = intersects[0].object.col;
+		var url = "placechip/" + col;
+		$.post(url, function (){
+			addChip(intersects[0].object.col);	
+			return;
+		});		
 	} 
 }
 
@@ -238,8 +243,6 @@ function gameOver(row, col, colour) {
 	}
 }
 
-
-
 function addChip(col) {
 
 	//get next available position in this column
@@ -268,6 +271,7 @@ function addChip(col) {
 	if (row >= 0 && row <= 5 && col >= 0 && col <= 6) {
 		gameOver(row, col, colour);
 	}
+
 }
 
 function onWindowResize() {

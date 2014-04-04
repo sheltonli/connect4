@@ -139,5 +139,70 @@ class Board extends CI_Controller {
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
  	
+ 	function getChip() {
+ 		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+ 			
+ 		$user = $_SESSION['user'];
+ 		 
+ 		$user = $this->user_model->get($user->login);
+ 		if ($user->user_status_id != User::PLAYING) {	
+ 			$errormsg="Not in PLAYING state";
+ 			goto error;
+ 		}
+ 		// start transactional mode  
+ 		$this->db->trans_begin();
+ 			
+ 		$match = $this->match_model->getExclusive($user->match_id);			
+ 		
+
+ 		// TRY CHANGING THIS	
+		$col = $match->board_state;
+
+ 		$this->match_model->updateBoard($match->id,"NULL");
+
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 		
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 		
+ 		echo json_encode(array('status'=>'success','col'=>$col));
+		return;
+		
+		transactionerror:
+		$this->db->trans_rollback();
+		
+		error:
+		echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
+ 	function placeChip($c) {
+ 		
+ 		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+
+ 		$user = $_SESSION['user'];
+ 			 
+ 		$user = $this->user_model->getExclusive($user->login);
+ 		if ($user->user_status_id != User::PLAYING) {	
+			$errormsg="Not in PLAYING state";
+ 			goto error;
+ 		}
+ 			
+ 		$match = $this->match_model->get($user->match_id);			
+ 			
+ 		$this->match_model->updateBoard($match->id,$c);
+ 				
+ 		echo json_encode(array('status'=>'success'));
+ 			 
+ 		return;
+ 		
+		error:
+			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
  }
 

@@ -27,8 +27,7 @@
 								
 						});
 					}
-					var url = "<?= base_url() ?>board/getMsg";
-					$.getJSON(url, function (data,text,jqXHR){
+					$.getJSON("<?= base_url() ?>board/getMsg", function (data,text,jqXHR){
 						if (data && data.status=='success') {
 							var conversation = $('[name=conversation]').val();
 							var msg = data.message;
@@ -36,10 +35,19 @@
 								$('[name=conversation]').val(conversation + "\n" + otherUser + ": " + msg);
 						}
 					});
+
+					$.getJSON("<?= base_url() ?>board/getChip", function (data,text,jqXHR){
+						if (data && data.status=='success') {
+							var col = data.col;
+							if (col != 'NULL')
+								addChip(col);
+						}
+					});
 			});
 
 			$('form').submit(function(){
 				var arguments = $(this).serialize();
+				console.log(arguments);
 				var url = "<?= base_url() ?>board/postMsg";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
 						var conversation = $('[name=conversation]').val();
