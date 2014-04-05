@@ -1,6 +1,7 @@
 var camera, scene, projector, renderer;
 var objects = [];
 var balls = [[],[],[],[],[],[]];
+var boardstate = [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
 var turn = 0;
 var colour = 0xFFFFFF;
 var pivot;
@@ -10,100 +11,102 @@ var xdeg = 0;
 var winners = [];
 var win = false;
 var tiecount = 0;
+var goodmove = 0;
+var mycolour = 0;
+var mynumber = 0;
 
 init();
 animate();
 
 function init() {
-scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500);
-camera.position.x = 0;
-camera.position.y = 0;
-camera.position.z = 100;
-
-scene.add(camera);
-
-renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setClearColor(0x000000, 1);
-renderer.sortObjects = false;
-//document.body.appendChild( renderer.domElement );
-var container = document.getElementById("board");
-document.body.appendChild(container);
-container.appendChild(renderer.domElement);
-
-pivot = new THREE.Object3D();
-board = addBoard();
-col1 = makeCol(0);
-col2 = makeCol(1);
-col3 = makeCol(2);
-col4 = makeCol(3);
-col5 = makeCol(4);
-col6 = makeCol(5);
-col7 = makeCol(6);
-
-col1.col = 0;
-col2.col = 1;
-col3.col = 2;
-col4.col = 3;
-col5.col = 4;
-col6.col = 5;
-col7.col = 6;
-
-objects.push(col1);
-objects.push(col2);
-objects.push(col3);
-objects.push(col4);
-objects.push(col5);
-objects.push(col6);
-objects.push(col7);
-
-pivot = new THREE.Object3D();
-pivot.add(col1);
-pivot.add(col2);
-pivot.add(col3);
-pivot.add(col4);
-pivot.add(col5);
-pivot.add(col6);
-pivot.add(col7);
-
-scene.add(pivot);
-
-var ballgeometry = new THREE.SphereGeometry(4,20,20);
-row = -1;
-for (i=0; i<42; i++) {
-	var mesh = new THREE.Mesh(ballgeometry, new THREE.MeshBasicMaterial({color : 0xFFFFFF}));
-
-	if (i % 7 == 0) {
-		row++;
-	} 
-
-	if (i % 7 == 0) {
-		col = 0;
-	} else {
-		col++;
+	scene = new THREE.Scene();
+	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500);
+	camera.position.x = 0;
+	camera.position.y = 0;
+	camera.position.z = 100;
+	
+	scene.add(camera);
+	
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor(0x000000, 1);
+	renderer.sortObjects = false;
+	//document.body.appendChild( renderer.domElement );
+	var container = document.getElementById("board");
+	document.body.appendChild(container);
+	container.appendChild(renderer.domElement);
+	
+	pivot = new THREE.Object3D();
+	board = addBoard();
+	col1 = makeCol(0);
+	col2 = makeCol(1);
+	col3 = makeCol(2);
+	col4 = makeCol(3);
+	col5 = makeCol(4);
+	col6 = makeCol(5);
+	col7 = makeCol(6);
+	
+	col1.col = 0;
+	col2.col = 1;
+	col3.col = 2;
+	col4.col = 3;
+	col5.col = 4;
+	col6.col = 5;
+	col7.col = 6;
+	
+	objects.push(col1);
+	objects.push(col2);
+	objects.push(col3);
+	objects.push(col4);
+	objects.push(col5);
+	objects.push(col6);
+	objects.push(col7);
+	
+	pivot = new THREE.Object3D();
+	pivot.add(col1);
+	pivot.add(col2);
+	pivot.add(col3);
+	pivot.add(col4);
+	pivot.add(col5);
+	pivot.add(col6);
+	pivot.add(col7);
+	
+	scene.add(pivot);
+	
+	var ballgeometry = new THREE.SphereGeometry(4,20,20);
+	row = -1;
+	for (i=0; i<42; i++) {
+		var mesh = new THREE.Mesh(ballgeometry, new THREE.MeshBasicMaterial({color : 0xFFFFFF}));
+	
+		if (i % 7 == 0) {
+			row++;
+		} 
+	
+		if (i % 7 == 0) {
+			col = 0;
+		} else {
+			col++;
+		}
+	
+		mesh.position.x = col * 10 - 35;
+		mesh.position.y = row * 10 - 25;
+		balls[row].push(mesh);
+		scene.add(mesh);
+		pivot.add(mesh);
 	}
-
-	mesh.position.x = col * 10 - 35;
-	mesh.position.y = row * 10 - 25;
-	balls[row].push(mesh);
-	scene.add(mesh);
-	pivot.add(mesh);
-}
-
-projector = new THREE.Projector();
-document.addEventListener("mousedown", mouseDown, false);
-
-controls = new THREE.OrbitControls(camera, container);
-controls.noPan = true;
-controls.noRoll = true;
-controls.domElement = document.body;
-
-window.addEventListener('resize', onWindowResize, false);
+	
+	projector = new THREE.Projector();
+	document.addEventListener("mousedown", mouseDown, false);
+	
+	controls = new THREE.OrbitControls(camera, container);
+	controls.noPan = true;
+	controls.noRoll = true;
+	controls.domElement = document.body;
+	
+	window.addEventListener('resize', onWindowResize, false);
 }
 
 function mouseDown(event) {
-	//event.preventDefault();
 
 	var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
 	projector.unprojectVector(vector, camera);
@@ -113,18 +116,39 @@ function mouseDown(event) {
 
 	if (intersects.length > 0) {
 		col = intersects[0].object.col;
-		tiecount = tiecount + 1;
-		addChip(intersects[0].object.col);	
-		var url = "placeChip/" + col;
-		$.post(url, function (){
-			return;
-		});		
+		if (turn == 0) {
+			addChip(intersects[0].object.col);
+		}
 	} 
 }
 
-//function callMe() {
-//	console.log("you rang?");
-//}
+function setTurn(whosTurn) {
+	turn = whosTurn;
+	if (turn == 0) {
+		console.log("it's my turn!!");
+	}
+}
+
+function setColour(mc) {
+	if (mc == 0) {
+		mycolour = 0x000000;
+		mynumber = 1;
+		console.log("my colour is black");
+	} else {
+		mycolour = 0xFF0000;
+		mynumber = 2;
+		console.log("my colour is red");
+	}
+
+}
+
+function goodMove() {
+	if (goodmove == 1) {
+		goodmove = 0;
+		return 1;
+	}
+	return 0;
+}
 
 function gameOver(row, col, colour) {
 
@@ -257,33 +281,56 @@ function gameOver(row, col, colour) {
 	}
 }
 
-function addChip(col) {
 
-	//get next available position in this column
+function addChip(col) {
 	row = 0;
-	if (turn == 0) {
-		colour = 0xFF0000;
-	} else {
-		colour = 0x000000;
-	}
+
 	for (i = 0; i < 6; i++) {
-		if (balls[row][col].material.color.getHex() != 0xFFFFFF) {
+		if (boardstate[row][col] != 0) {
 			row++;
 		}
-
 	}
 	if (row < 6) {
-		balls[row][col].material.color.setHex(colour);
-	}
-
-	if (turn == 0) {
-		turn = 1;
-	} else {
-		turn = 0;
+		boardstate[row][col] = mynumber;
+		balls[row][col].material.color.setHex(mycolour);
 	}
 
 	if (row >= 0 && row <= 5 && col >= 0 && col <= 6) {
-		gameOver(row, col, colour);
+		gameOver(row, col, mycolour);
+	}
+
+	if (row < 6) {
+		bs = JSON.stringify(boardstate);
+		var url = "placeChip/" + tiecount;
+		$.post(url, {"boardstate" : bs}, function (){
+			tiecount = tiecount + 1;
+			goodmove = 1;
+			return;
+		});		
+	}
+}
+
+function drawBoard(bs) {
+
+	if (bs != null) {
+		boardstate = bs;
+
+		for (i = 0; i < 6; i++) {
+			for (j = 0; j < 7; j++) {
+				if (boardstate[i][j] == 0) {
+
+					balls[i][j].material.color.setHex(0xFFFFFF);
+				} else if (boardstate[i][j] == 1) {
+
+					balls[i][j].material.color.setHex(0x000000);
+
+				} else {
+
+					balls[i][j].material.color.setHex(0xFF0000);
+				}
+			}
+		}
+
 	}
 
 }

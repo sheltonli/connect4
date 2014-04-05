@@ -1,6 +1,7 @@
 <?php
 
 class Board extends CI_Controller {
+	public $turn = 1;
      
     function __construct() {
     		// Call the Controller constructor
@@ -155,11 +156,9 @@ class Board extends CI_Controller {
  			
  		$match = $this->match_model->getExclusive($user->match_id);			
  		
+		$boardstate = $match->board_state;
 
- 		// TRY CHANGING THIS	
-		$col = $match->board_state;
-
- 		$this->match_model->updateBoard($match->id,"NULL");
+ 		//$this->match_model->updateBoard($match->id,"NULL");
 
  		if ($this->db->trans_status() === FALSE) {
  			$errormsg = "Transaction error";
@@ -169,7 +168,7 @@ class Board extends CI_Controller {
  		// if all went well commit changes
  		$this->db->trans_commit();
  		
- 		echo json_encode(array('status'=>'success','col'=>$col));
+ 		echo json_encode(array('status'=>'success','boardstate'=>$boardstate));
 		return;
 		
 		transactionerror:
@@ -179,7 +178,7 @@ class Board extends CI_Controller {
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
 
- 	function placeChip($c) {
+ 	function placeChip() {
  		
  		$this->load->model('user_model');
  		$this->load->model('match_model');
@@ -194,7 +193,8 @@ class Board extends CI_Controller {
  			
  		$match = $this->match_model->get($user->match_id);			
  			
- 		$this->match_model->updateBoard($match->id,$c);
+		$boardstate = $this->input->post('boardstate');
+ 		$this->match_model->updateBoard($match->id, $boardstate);
  				
  		echo json_encode(array('status'=>'success'));
  			 
@@ -203,6 +203,45 @@ class Board extends CI_Controller {
 		error:
 			echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
+
+	
+	function myTurn($moves) {
+		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+
+ 		$user = $_SESSION['user'];
+ 			 
+ 		$user = $this->user_model->getExclusive($user->login);
+
+ 		if ($user->user_status_id != User::PLAYING) {	
+			$errormsg="Not in PLAYING state";
+ 			goto error;
+ 		}
+
+ 		$match = $this->match_model->get($user->match_id);			
+		$myturn = 0;
+		$mycolour = 0;
+
+		if ($match->user1_id == $user->id) {
+			$mycolour = 0;
+			if ($moves % 2 ==  0) {
+				$myturn = 1;
+			}
+		} else {
+			$mycolour = 1;
+			if ($moves % 2 == 1) {
+				$myturn = 1;
+			}
+		}
+ 			
+ 		echo json_encode(array('status'=>'success', 'myturn'=>$myturn, 'mycolour'=>$mycolour));
+ 			 
+ 		return;
+ 		
+		error:
+			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
 
 	function youWin() {
 		$this->load->model('user_model');

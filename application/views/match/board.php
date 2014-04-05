@@ -11,7 +11,7 @@
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
 		var status = "<?= $status ?>";
-		var t = 1;
+		var moves = 0;
 		
 		$(function(){
 			$('body').everyTime(2000,function(){
@@ -37,14 +37,30 @@
 						}
 					});
 
-					$.getJSON("<?= base_url() ?>board/getChip/" + t, function (data,text,jqXHR){
+					$.getJSON("<?= base_url() ?>board/getChip/", function (data,text,jqXHR){
 						if (data && data.status=='success') {
-							var col = data.col;
-							t = data.turn;
-							if (col != 'NULL')
-								addChip(col);
+							var boardstate = JSON.parse(data.boardstate);
+							if (boardstate != 'NULL') {
+								drawBoard(boardstate);
+								moves = 0;
+								for (i = 0; i < 6; i++) {
+									for (j = 0; j < 6; j++) {
+										if (boardstate[i][j] != 0) {
+											moves ++;
+										}
+									}
+								}
+							}
 						}
 					});
+
+					$.getJSON("<?= base_url() ?>board/myTurn/" + moves, function(data, text, jqXHR) {
+						if (data && data.status=='success') {
+							setTurn(data.myturn);
+							setColour(data.mycolour);
+						}
+					
+					});	
 			});
 
 			$('form').submit(function(){
